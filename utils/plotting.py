@@ -1,5 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from umap import UMAP
 
 
 def plot_all_reconstructions(images_dict):
@@ -125,6 +127,7 @@ def plot_ae_reconstructions(model, dataset, device="cpu", n=10, indices=None):
     plt.tight_layout()
     plt.show()
 
+
 def plot_dec_centers(dec, ae):
     dec.eval()
     ae.eval()
@@ -147,4 +150,34 @@ def plot_dec_centers(dec, ae):
         ax.set_title(f'Cluster {i}')
 
     plt.tight_layout()
+    plt.show()
+
+
+def plot_dec_pca(input, latent, labels, figsize=(12, 5), title=None):
+    pca = PCA(n_components=2)
+
+    input_pca = pca.fit_transform(input)
+    latent_pca = pca.fit_transform(latent)
+
+    plot_input_latent(figsize, input_pca, labels, latent_pca, title)
+
+
+def plot_dec_umap(input, latent, labels, figsize=(12, 5), title=None, n_neighbors=15, min_dist=0.1):
+    reducer = UMAP(n_neighbors=n_neighbors, min_dist=min_dist)
+
+    input_umap = reducer.fit_transform(input)
+    latent_umap = reducer.fit_transform(latent)
+
+    plot_input_latent(figsize, input_umap, labels, latent_umap, title)
+
+
+def plot_input_latent(figsize, input_umap, labels, latent_umap, title):
+    fig, axes = plt.subplots(1, 2, figsize=figsize)
+    sc1 = axes[0].scatter(input_umap[:, 0], input_umap[:, 1], c=labels, cmap="tab10", s=5)
+    axes[0].set_title("Raw Data")
+    sc2 = axes[1].scatter(latent_umap[:, 0], latent_umap[:, 1], c=labels, cmap="tab10", s=5)
+    axes[1].set_title("Latent Space")
+    fig.colorbar(sc1, ax=axes, location='right', fraction=0.025, pad=0.02)
+    if title:
+        fig.suptitle(title)
     plt.show()
