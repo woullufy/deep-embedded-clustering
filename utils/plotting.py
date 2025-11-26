@@ -73,7 +73,7 @@ def plot_ae_losses(ae_losses):
     plt.show()
 
 
-def plot_ae_reconstructions(model, dataset, device="cpu", n=10, indices=None):
+def plot_ae_reconstructions(model, dataset, device="cpu", n=10, points=None):
     """
     Plot original vs reconstructed images.
     Top row: originals
@@ -81,10 +81,10 @@ def plot_ae_reconstructions(model, dataset, device="cpu", n=10, indices=None):
     """
 
     model.eval()
-    if indices is None:
+    if points is None:
         indices = torch.randint(0, len(dataset), size=(n,))
     else:
-        n = len(indices)
+        n = len(points)
 
     originals = []
     recons = []
@@ -121,6 +121,29 @@ def plot_ae_reconstructions(model, dataset, device="cpu", n=10, indices=None):
         plt.imshow(recons[i], cmap="gray")
         ax.set_title("Reconstructed")
         plt.axis("off")
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_dec_centers(dec, ae):
+    dec.eval()
+    ae.eval()
+
+    z = dec.cluster_centers
+
+    with torch.no_grad():
+        centers_hat = ae.decoder(z)
+
+    centers_img = centers_hat.cpu().numpy().reshape(-1, 28, 28)
+
+    n_clusters = len(centers_img)
+    fig, axes = plt.subplots(1, n_clusters, figsize=(15, 3))
+
+    for i in range(n_clusters):
+        ax = axes[i]
+        ax.imshow(centers_img[i], cmap='gray')
+        ax.axis('off')
+        ax.set_title(f'Cluster {i}')
 
     plt.tight_layout()
     plt.show()

@@ -11,6 +11,8 @@ def train_dec(
         device="cpu"
 ):
     model.to(device)
+    model.initialize_centers(train_loader, device)
+
     model.train()
     losses = []
 
