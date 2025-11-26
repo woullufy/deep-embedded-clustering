@@ -75,7 +75,7 @@ def plot_ae_losses(ae_losses):
     plt.show()
 
 
-def plot_ae_reconstructions(model, dataset, device="cpu", n=10, indices=None):
+def plot_ae_reconstructions(model, dataset, device=None, n=10, indices=None):
     """
     Plot original vs reconstructed images.
     Top row: originals
@@ -83,6 +83,9 @@ def plot_ae_reconstructions(model, dataset, device="cpu", n=10, indices=None):
     """
 
     model.eval()
+    if device is None:
+        device = next(model.parameters()).device
+
     if indices is None:
         indices = torch.randint(0, len(dataset), size=(n,))
     else:
@@ -132,9 +135,8 @@ def plot_dec_centers(dec, ae):
     dec.eval()
     ae.eval()
 
-    z = dec.cluster_centers
-
     with torch.no_grad():
+        z = dec.cluster_centers
         centers_hat = ae.decoder(z)
 
     centers_img = centers_hat.cpu().numpy().reshape(-1, 28, 28)
