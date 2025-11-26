@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import numpy as np
+from sklearn.cluster import KMeans
 
 
 class DEC(nn.Module):
@@ -31,27 +32,25 @@ class DEC(nn.Module):
 
         return q, z
 
+    def initialize_centers(self, dataloader, device):
+        self.eval()
+        features = []
+
+        with torch.no_grad():
+            for x, y in dataloader:
+                # x = batch[0].to(device)
+                x = x.to(device)
+                z = self.encoder(x)
+                features.append(z.cpu().numpy())
+
+        features = np.concatenate(features)
+
+        kmeans = KMeans(n_clusters=self.num_clusters, n_init=20)
+        kmeans.fit(features)
+
+        self.cluster_centers.data = torch.tensor(kmeans.cluster_centers_).to(device)
+
 
 def target_distribution(q):
     weight = q ** 2 / torch.sum(q, dim=0)
     return (weight.t() / torch.sum(weight, dim=1)).t()
-
-
-def soft_assign(self, z):
-    diff = z.unsqueeze(1) - self.cluster_centers.unsqueeze(0)
-    dist_sq = torch.sum(diff ** 2, dim=2)
-
-    # Student-t kernel
-    numerator = (1.0 + dist_sq / self.alpha) ** (-(self.alpha + 1) / 2)
-    q = numerator / torch.sum(numerator, dim=1, keepdim=True)
-
-    return q
-
-
-def init_cluster_centers(self, z):
-    """
-    Initialize cluster centers using k-means results.
-    z: numpy array of latent vectors (N x latent_dim)
-    """
-    assert z.ndim == 2
-    self.cluster_centers.data.copy_(torch.tensor(z, dtype=torch.float32))

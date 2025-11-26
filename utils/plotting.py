@@ -23,7 +23,8 @@ def plot_all_reconstructions(images_dict):
     for row_idx, (img_index, data) in enumerate(images_dict.items()):
 
         # Original image
-        original = data["original"].detach().cpu().squeeze()  # (28,28)
+        original = data["original"].detach().cpu().squeeze()
+        original = original.view(28, 28)
         axes[row_idx, 0].imshow(original, cmap="gray")
         axes[row_idx, 0].set_title(f"Original (idx={img_index})")
         axes[row_idx, 0].axis("off")
@@ -72,7 +73,7 @@ def plot_ae_losses(ae_losses):
     plt.show()
 
 
-def plot_ae_reconstructions(model, dataset, device="cpu", n=9):
+def plot_ae_reconstructions(model, dataset, device="cpu", n=10, indices=None):
     """
     Plot original vs reconstructed images.
     Top row: originals
@@ -80,7 +81,10 @@ def plot_ae_reconstructions(model, dataset, device="cpu", n=9):
     """
 
     model.eval()
-    indices = torch.randint(0, len(dataset), size=(n,))
+    if indices is None:
+        indices = torch.randint(0, len(dataset), size=(n,))
+    else:
+        n = len(indices)
 
     originals = []
     recons = []
