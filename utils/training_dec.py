@@ -8,7 +8,7 @@ def train_dec(
         loss_fn,
         tensor_x,  # TODO solve this nicely
         epochs=10,
-        device="cpu"
+        device="cpu",
 ):
     model.to(device)
     model.initialize_centers(train_loader, device)
@@ -28,9 +28,11 @@ def train_dec(
         for batch_idx, (inputs, idxs) in enumerate(train_loader):
             q, _ = model(inputs)
             p_batch = p_full[idxs]
+
+            # Calculate loss
             loss = loss_fn(q.log(), p_batch)
 
-            # Backprop
+            # Backpropagation
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()

@@ -135,6 +135,7 @@ def plot_dec_centers(dec, ae):
         centers_hat = ae.decoder(z)
 
     centers_img = centers_hat.cpu().numpy().reshape(-1, 28, 28)
+    # centers_img = centers_hat.cpu().numpy().reshape(-1, 8, 8)
 
     n_clusters = len(centers_img)
     fig, axes = plt.subplots(1, n_clusters, figsize=(15, 3))
