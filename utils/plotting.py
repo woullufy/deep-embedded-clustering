@@ -75,7 +75,7 @@ def plot_ae_losses(ae_losses):
     plt.show()
 
 
-def plot_ae_reconstructions(model, dataset, device=None, n=10, indices=None):
+def plot_ae_reconstructions(model, dataset, n=10, device=None, indices=None):
     """
     Plot original vs reconstructed images.
     Top row: originals
