@@ -73,7 +73,7 @@ def plot_ae_losses(ae_losses):
     plt.show()
 
 
-def plot_ae_reconstructions(model, dataset, device="cpu", n=10, points=None):
+def plot_ae_reconstructions(model, dataset, device="cpu", n=10, indices=None):
     """
     Plot original vs reconstructed images.
     Top row: originals
@@ -81,10 +81,10 @@ def plot_ae_reconstructions(model, dataset, device="cpu", n=10, points=None):
     """
 
     model.eval()
-    if points is None:
+    if indices is None:
         indices = torch.randint(0, len(dataset), size=(n,))
     else:
-        n = len(points)
+        n = len(indices)
 
     originals = []
     recons = []
