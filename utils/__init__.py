@@ -1,10 +1,12 @@
 from .datasets import (load_mnist,
                        load_fashion_mnist,
                        )
-from .plotting import (plot_ae_losses,
+from .plotting import (plot_losses,
                        plot_ae_reconstructions,
                        plot_all_reconstructions,
                        plot_dec_centers,
+                       plot_pca,
+                       plot_umap
                        )
 
 from .training_ae import train_autoencoder
@@ -15,7 +17,9 @@ __all__ = [
     'load_mnist',
     'load_fashion_mnist',
 
-    'plot_ae_losses',
+    'plot_losses',
+    'plot_pca',
+    'plot_umap',
     'plot_ae_reconstructions',
     'plot_all_reconstructions',
     'plot_dec_centers',
