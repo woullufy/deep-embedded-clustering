@@ -9,7 +9,7 @@ def train_idec(
         mse_loss_fn,
         tensor_x,  # TODO solve this nicely
         epochs=10,
-        gamma=0.01,
+        gamma=0.1,
         device="cpu",
 ):
     model.to(device)
@@ -37,7 +37,8 @@ def train_idec(
             # Calculate loss
             kl_loss = kl_loss_fn(q.log(), p_batch)
             mse_loss = mse_loss_fn(x_reconstructed, inputs)
-            loss = kl_loss + gamma * mse_loss
+            # loss = kl_loss + gamma * mse_loss
+            loss = mse_loss + gamma * kl_loss
 
             # Backpropagation
             optimizer.zero_grad()
@@ -58,6 +59,7 @@ def train_idec(
 
         print(f"Epoch {epoch}/{epochs}: average kl loss = {total_kl_loss:.4f} mse loss = {total_mse_loss:.4f}")
 
+    return total_losses, kl_losses, mse_losses
 
 def target_distribution(q):
     weight = q ** 2 / torch.sum(q, dim=0)
