@@ -74,6 +74,94 @@ def plot_ae_losses(ae_losses):
     plt.tight_layout()
     plt.show()
 
+def plot_idec_losses(losses, kl_losses, mse_losses):
+    epochs = range(1, len(losses) + 1)
+
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(epochs, losses, label="Total Loss", linewidth=2.5, color="black")
+    plt.plot(epochs, kl_losses, label="Clustering Loss (KL)", linewidth=2, color="red")
+    plt.plot(epochs, mse_losses, label="Reconstruction Loss", linewidth=2, color="blue")
+
+    plt.xlabel("Epoch", fontsize=12)
+    plt.ylabel("Loss", fontsize=12)
+    plt.title("IDEC Training Losses", fontsize=14)
+
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_losses(
+    ae_losses=None,
+    dec_losses=None,
+    idec_total=None,
+    idec_kl=None,
+    idec_recon=None,
+    title=None,
+):
+
+    plt.figure(figsize=(10, 6))
+
+    if ae_losses is not None:
+        plt.plot(
+            range(1, len(ae_losses) + 1),
+            ae_losses,
+            label="AE Loss",
+            linewidth=2,
+            color="blue",
+        )
+
+    if dec_losses is not None:
+        plt.plot(
+            range(1, len(dec_losses) + 1),
+            dec_losses,
+            label="DEC KL Loss",
+            linewidth=2,
+            color="purple",
+        )
+
+    if idec_total is not None:
+        plt.plot(
+            range(1, len(idec_total) + 1),
+            idec_total,
+            label="IDEC Total Loss",
+            linewidth=2.5,
+            color="black",
+        )
+    if idec_kl is not None:
+        plt.plot(
+            range(1, len(idec_kl) + 1),
+            idec_kl,
+            label="IDEC Clustering Loss (KL)",
+            linewidth=2,
+            color="red",
+        )
+    if idec_recon is not None:
+        plt.plot(
+            range(1, len(idec_recon) + 1),
+            idec_recon,
+            label="IDEC Reconstruction Loss",
+            linewidth=2,
+            color="green",
+        )
+
+
+    plt.xlabel("Epoch", fontsize=12)
+    plt.ylabel("Loss", fontsize=12)
+
+    if title:
+        plt.title(title, fontsize=14)
+    else:
+        plt.title("Training Losses", fontsize=15)
+
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
 
 def plot_ae_reconstructions(model, dataset, n=10, device=None, indices=None):
     """
@@ -155,7 +243,7 @@ def plot_dec_centers(dec, ae):
     plt.show()
 
 
-def plot_dec_pca(input, latent, labels, figsize=(12, 5), title=None):
+def plot_pca(input, latent, labels, figsize=(12, 5), title=None):
     pca = PCA(n_components=2)
 
     input_pca = pca.fit_transform(input)
@@ -164,7 +252,7 @@ def plot_dec_pca(input, latent, labels, figsize=(12, 5), title=None):
     plot_input_latent(figsize, input_pca, labels, latent_pca, title)
 
 
-def plot_dec_umap(input, latent, labels, figsize=(12, 5), title=None, n_neighbors=15, min_dist=0.1):
+def plot_umap(input, latent, labels, figsize=(12, 5), title=None, n_neighbors=15, min_dist=0.1):
     reducer = UMAP(n_neighbors=n_neighbors, min_dist=min_dist)
 
     input_umap = reducer.fit_transform(input)
