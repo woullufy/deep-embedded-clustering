@@ -38,7 +38,7 @@ def train_autoencoder(
         epoch_loss /= len(train_loader.dataset)
         losses.append(epoch_loss)
 
-        if image_indices is not None:
+        if image_indices is not None and epoch % 10 == 0:
             model.eval()
             with torch.no_grad():
                 for k, v in images.items():

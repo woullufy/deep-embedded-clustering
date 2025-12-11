@@ -1,5 +1,7 @@
-import torch
+import random
+
 import matplotlib.pyplot as plt
+import torch
 from sklearn.decomposition import PCA
 from umap import UMAP
 
@@ -74,6 +76,7 @@ def plot_ae_losses(ae_losses):
     plt.tight_layout()
     plt.show()
 
+
 def plot_idec_losses(losses, kl_losses, mse_losses):
     epochs = range(1, len(losses) + 1)
 
@@ -93,15 +96,15 @@ def plot_idec_losses(losses, kl_losses, mse_losses):
     plt.tight_layout()
     plt.show()
 
-def plot_losses(
-    ae_losses=None,
-    dec_losses=None,
-    idec_total=None,
-    idec_kl=None,
-    idec_recon=None,
-    title=None,
-):
 
+def plot_losses(
+        ae_losses=None,
+        dec_losses=None,
+        idec_total=None,
+        idec_kl=None,
+        idec_recon=None,
+        title=None,
+):
     plt.figure(figsize=(10, 6))
 
     if ae_losses is not None:
@@ -147,7 +150,6 @@ def plot_losses(
             color="green",
         )
 
-
     plt.xlabel("Epoch", fontsize=12)
     plt.ylabel("Loss", fontsize=12)
 
@@ -163,27 +165,23 @@ def plot_losses(
     plt.show()
 
 
-def plot_ae_reconstructions(model, dataset, n=10, device=None, indices=None):
-    """
-    Plot original vs reconstructed images.
-    Top row: originals
-    Bottom row: reconstructions
-    """
-
+def plot_classes_reconstruction(model, dataset, device=None):
     model.eval()
     if device is None:
         device = next(model.parameters()).device
 
-    if indices is None:
-        indices = torch.randint(0, len(dataset), size=(n,))
-    else:
-        n = len(indices)
+    label_to_indices = {i: [] for i in range(10)}
+    for idx in range(len(dataset)):
+        _, label = dataset[idx]
+        label_to_indices[label].append(idx)
+
+    chosen_indices = [random.choice(label_to_indices[label]) for label in range(10)]
 
     originals = []
     recons = []
 
     with torch.no_grad():
-        for idx in indices:
+        for idx in chosen_indices:
             img, _ = dataset[idx]
             img_batch = img.unsqueeze(0).to(device)
 
@@ -191,26 +189,22 @@ def plot_ae_reconstructions(model, dataset, n=10, device=None, indices=None):
 
             if x_hat.dim() == 2:
                 rec = x_hat.view(1, 1, 28, 28)
-            else:
-                rec = x_hat
 
             originals.append(img.squeeze())
             recons.append(rec.squeeze().cpu())
 
     rows = 2
-    cols = n
-    plt.figure(figsize=(2 * n, 4))
+    cols = 10
+    plt.figure(figsize=(20, 4))
 
-    # Original images
-    for i in range(n):
+    for i in range(10):
         ax = plt.subplot(rows, cols, i + 1)
         plt.imshow(originals[i], cmap="gray")
-        ax.set_title("Original")
+        ax.set_title(f"Label {i}")
         plt.axis("off")
 
-    # Reconstructed images
-    for i in range(n):
-        ax = plt.subplot(rows, cols, n + i + 1)
+    for i in range(10):
+        ax = plt.subplot(rows, cols, cols + i + 1)
         plt.imshow(recons[i], cmap="gray")
         ax.set_title("Reconstructed")
         plt.axis("off")
@@ -244,10 +238,11 @@ def plot_dec_centers(dec, ae):
 
 
 def plot_pca(input, latent, labels, figsize=(12, 5), title=None):
-    pca = PCA(n_components=2)
+    pca_input = PCA(n_components=2)
+    pca_latent = PCA(n_components=2)
 
-    input_pca = pca.fit_transform(input)
-    latent_pca = pca.fit_transform(latent)
+    input_pca = pca_input.fit_transform(input)
+    latent_pca = pca_latent.fit_transform(latent)
 
     plot_input_latent(figsize, input_pca, labels, latent_pca, title)
 

@@ -1,6 +1,4 @@
-from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
@@ -39,3 +37,26 @@ def load_mnist():
     )
 
     return training_data, test_data
+
+
+def create_dataloaders(train_data, test_data, batch_size=64, shuffle=True):
+    train_loader = DataLoader(
+        train_data,
+        batch_size=batch_size,
+        shuffle=shuffle
+    )
+
+    test_loader = DataLoader(
+        test_data,
+        batch_size=batch_size,
+        shuffle=False
+    )
+
+    return train_loader, test_loader
+
+
+def get_input_matrix(dataset, device="cpu"):
+    X = dataset.data.float().reshape(len(dataset), -1) / 255.0
+    y = dataset.targets
+
+    return X.to(device), y.to(device)
